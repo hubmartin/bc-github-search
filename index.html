@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+<script>
+
+var repositories = ["org:bigclownlabs",
+                    "org:bigclownprojects",
+                    "user:hubmartin",
+                    "user:blavka",
+                    "user:hubpav",
+                    "-repo:bigclownlabs/bcf-sdk"];
+
+var app = angular.module("myApp", []);
+app.controller("myCtrl", function($scope) {
+
+    $scope.repositories = [];
+    repositories.forEach(function(str) {
+        $scope.repositories.push({"name" : str, "checked": true});
+    })
+
+    $scope.name = "bc_rtc";
+
+    $scope.search = function ()
+    {
+        const text = document.getElementsByName("search")[0].value;
+        const exclude_sdk = false //document.getElementsByName("exclude_sdk")[0].value;
+
+        var url = "https://github.com/search?p=1&type=Code&q=";
+        var query = "";
+
+        $scope.repositories.forEach(function(repo){
+            if(repo.checked == true)
+            {
+                query += " " + repo.name;
+            }
+        })
+
+        query += "+" + text;
+
+        url += encodeURI(query);
+
+        //document.location.href = url; 
+        console.log(url);
+    }
+    
+    $scope.is_org = function(repo, index, arr)
+    {
+        return repo.name.includes("org:")
+    }
+
+    $scope.is_user = function(repo, index, arr)
+    {
+        return repo.name.includes("user:")
+    }
+
+    $scope.is_exclude = function(repo, index, arr)
+    {
+        return repo.name.startsWith("-")
+    }
+
+    $scope.f = function(repo, index, arr)
+    {
+        console.log(repo);
+        return "x"
+    }
+});
+</script>
+
+</head>
+<body ng-app="myApp"  ng-controller="myCtrl">
+<div class="container">
+    <div class="jumbotron">
+
+        <div>
+        <p>Find <input type="text" name="search" ng-model="name"> <input type="button" value="Search" ng-click="search()" /></p>
+        </div>
+
+    </div>
+
+        <div class="row">
+
+                <div class="col-md-4">
+                        <p>Organizations</p>
+                        <div  class="form-check" ng-repeat="repo in repositories | filter:is_org">
+                            <label><input type="checkbox" value="{{repo.name}}" checked 
+                                ng-model="repo.checked" />{{repo.name}}</label>
+                        </div>
+                </div>
+
+                <div class="col-md-4">
+                        <p>Users</p>
+                        <div  class="form-check" ng-repeat="repo in repositories | filter:is_user">
+                                <label><input type="checkbox" value="{{repo.name}}" checked 
+                                    ng-model="repo.checked" />{{repo.name}}</label>
+                        </div>
+                </div>
+
+                <div class="col-md-4">
+                        <p>Exclude</p>            
+                        <div  class="form-check" ng-repeat="repo in repositories | filter:is_exclude">
+                                <label><input type="checkbox" value="{{repo.name}}" checked 
+                                    ng-model="repo.checked" />{{repo.name}}</label>
+                        </div>
+                </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-8">.col-xs-12 .col-sm-6 .col-md-8</div>
+            <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
+        </div>
+</div>
+
+
+</body>
+</html>
