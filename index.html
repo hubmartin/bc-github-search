@@ -18,7 +18,27 @@ var repositories = ["org:bigclownlabs",
                     "user:hubpav",
                     "-repo:bigclownlabs/bcf-sdk"];
 
+window.onload = function()
+{
+    document.getElementsByName("search")[0].focus();
+}
+
 var app = angular.module("myApp", []);
+
+app.directive('myEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.myEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+});
+
 app.controller("myCtrl", function($scope) {
 
     $scope.repositories = [];
@@ -26,7 +46,7 @@ app.controller("myCtrl", function($scope) {
         $scope.repositories.push({"name" : str, "checked": true});
     })
 
-    $scope.name = "bc_rtc";
+    $scope.name = "";
 
     $scope.search = function ()
     {
@@ -34,7 +54,7 @@ app.controller("myCtrl", function($scope) {
         const exclude_sdk = false //document.getElementsByName("exclude_sdk")[0].value;
 
         var url = "https://github.com/search?p=1&type=Code&q=";
-        var query = "";
+        var query = text;
 
         $scope.repositories.forEach(function(repo){
             if(repo.checked == true)
@@ -42,8 +62,6 @@ app.controller("myCtrl", function($scope) {
                 query += " " + repo.name;
             }
         })
-
-        query += "+" + text;
 
         url += encodeURI(query);
 
@@ -80,7 +98,7 @@ app.controller("myCtrl", function($scope) {
     <div class="jumbotron">
 
         <div>
-        <p>Find <input type="text" name="search" ng-model="name"> <input type="button" value="Search" ng-click="search()" /></p>
+        <p>Find <input type="text" name="search" ng-model="name" my-enter="search()"> <input type="button" value="Search" ng-click="search()" /></p>
         </div>
 
     </div>
